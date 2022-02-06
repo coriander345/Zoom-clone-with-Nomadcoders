@@ -1,0 +1,32 @@
+{
+  "name": "zoom-clone-with-nomadcoders",
+  "version": "1.0.0",
+  "description": "Zoom Clone using WebRTC and Websockets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coriander345/Zoom-clone-with-Nomadcoders.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coriander345/Zoom-clone-with-Nomadcoders/issues"
+  },
+  "homepage": "https://github.com/coriander345/Zoom-clone-with-Nomadcoders#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.0",
+    "@babel/core": "^7.17.0",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "express": "^4.17.2",
+    "pug": "^3.0.2"
+  }
+}
