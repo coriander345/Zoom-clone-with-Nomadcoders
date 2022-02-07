@@ -11,6 +11,11 @@ html(lang="en")
     header
       h1 Noom! 
     main 
-      h2 Welcome to Noom  
-    button call
+      div#welcome
+        form 
+          input(type="text", placeholder="room name", required)
+          button Enter room
+    
+    script(src="/socket.io/socket.io.js")
     script(src="/public/js/app.js")
+    
