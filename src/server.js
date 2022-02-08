@@ -15,11 +15,32 @@ const io = SocketIO(server)
 // const wss = new WebSocket.Server({server})
 
 io.on("connection", socket=>{
-  socket.on("enter_room", (msg, done)=>{
-    setTimeout(()=>{
-      done()
-    },10000)
+socket["nick"] = "Anon"
+
+  socket.onAny((event)=>{
+    console.log(`Socket Event: ${event}`)
   })
+
+  socket.on("enter_room", (roomName, done)=>{
+    socket.join(roomName)
+      done()
+    socket.to(roomName).emit("welcome", socket.nick)
+  })
+
+  socket.on("disconnecting", (reason) => {
+    for (const room of socket.rooms) {
+      if (room !== socket.id) {
+        socket.to(room).emit("bye", socket.nick);
+      }
+    }
+  });
+
+  socket.on("new_message", (msg,room,done)=>{
+    socket.to(room).emit("new_message", `${socket.nick}: ${msg}`)
+    done()
+  })
+
+  socket.on("nick", (nick)=>(socket["nick"] = nick))
 });
 // function onSocketMessage(message) {
   
