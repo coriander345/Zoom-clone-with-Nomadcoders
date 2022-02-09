@@ -10,66 +10,28 @@ app.use("/public", express.static(__dirname + "/public"))
 app.get("/", (req,res)=>res.render("home"))
 app.get("/*", (req,res)=>res.redirect("/"))
 
-const server = http.createServer(app);
-const io = SocketIO(server)
-// const wss = new WebSocket.Server({server})
+const httpServer = http.createServer(app);
+const io = SocketIO(httpServer)
 
 io.on("connection", socket=>{
-socket["nick"] = "Anon"
 
-  socket.onAny((event)=>{
-    console.log(`Socket Event: ${event}`)
-  })
-
-  socket.on("enter_room", (roomName, done)=>{
+  socket.on("join_room", (roomName)=>{
     socket.join(roomName)
-      done()
-    socket.to(roomName).emit("welcome", socket.nick)
-  })
-
-  socket.on("disconnecting", (reason) => {
-    for (const room of socket.rooms) {
-      if (room !== socket.id) {
-        socket.to(room).emit("bye", socket.nick);
-      }
-    }
-  });
-
-  socket.on("new_message", (msg,room,done)=>{
-    socket.to(room).emit("new_message", `${socket.nick}: ${msg}`)
-    done()
-  })
-
-  socket.on("nick", (nick)=>(socket["nick"] = nick))
-});
-// function onSocketMessage(message) {
-  
-// }
-
-// const sockets = []
-
-// wss.on("connection", (socket)=>{
-//   sockets.push(socket)
-//   socket["nickname"] = "Anon"
-//   console.log("Connected to Browser")
-//   socket.on("close",onSocketClose)
-//   socket.on("message", (message)=>{
-//     const parsed = JSON.parse(message)
-//     switch (parsed.type){
-//       case "new_message":
-//         sockets.forEach((aSocket)=>{
-//           aSocket.send(`${socket["nickname"]}:`+parsed.payload)})
-//         break;
-//       case "nickname":
-//         socket["nickname"] = parsed.payload
-      
-//        break;
-//       }
-
     
+    socket.to(roomName).emit("welcome")
+  })
 
-//   })
-  
-// })
+  socket.on("offer", (offer, roomName)=>{
+    socket.to(roomName).emit("offer", offer)
+  })
+
+  socket.on("answer", (answer,roomName)=>{
+    socket.to(roomName).emit("answer", answer)
+  })
+
+  socket.on("ice", (ice,roomName)=>{
+    socket.to(roomName).emit("ice", ice)
+  })
+})
 const handleListen = ()=>console.log("hello")
-server.listen(3000,handleListen)
+httpServer.listen(3000,handleListen)

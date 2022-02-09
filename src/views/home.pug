@@ -12,18 +12,17 @@ html(lang="en")
       h1 Noom! 
     main 
       div#welcome
-        form 
+        form(action="") 
           input(type="text", placeholder="room name", required)
-          button Enter room
-      div#room
+          button#enterBtn Enter room
+      div#call
         h3
-        ul 
-        form#name  
-          input(placeholder="nick", required, type="text")
-          button save
-        form#msg  
-          input(placeholder="message", required, type="text")
-          button Send
+        div#myStream 
+          video#myFace(autoplay, playsinline, width="400", height="400")
+          button#mute Mute
+          button#camera turn Camera Off
+          select#cameras
+          video#peersStream(autoplay, playsinline, width="400", height="400")
     script(src="/socket.io/socket.io.js")
     script(src="/public/js/app.js")
     
