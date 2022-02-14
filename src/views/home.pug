@@ -5,16 +5,19 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Noom
-    link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet", href="/public/css/styled.css")
 
   body 
     header
       h1 Noom! 
+      img(class="logo" src="../public/photos/bearFoot.png", width="100px", height="100px")
+      div#roomList
+        ul
     main 
       div#welcome
-        form(action="") 
-          input(type="text", placeholder="room name", required)
-          button#enterBtn Enter room
+        form(class="roomNameForm" action="") 
+          input(class="roomNameInput" type="text", placeholder="room name", required)
+          button#enterBtn Create Room
       div#call
         h3
         div#myStream 

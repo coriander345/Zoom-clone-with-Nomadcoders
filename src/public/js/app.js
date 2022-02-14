@@ -17,6 +17,8 @@ let roomName;
 let myPeerConnection;
 call.hidden=true
 
+let myDataChannel;
+
 
 async function getCameras() {
   try {
@@ -80,10 +82,17 @@ function handleCameraClick(){
     cameraBtn.innerText = "Turn Camera ON"
     cameraOff = true
   }
+  
 }
 
 async function handleCameraChange(){
   await getMedia(camerasSelect.value)
+  if(myPeerConnection){
+    const videoTrack = myStream.getVideoTracks()[0]
+  const videoSender = myPeerConnection.getSenders().find(sender=>sender.track.kind == "video")
+  console.log(videoSender)
+  videoSender.replaceTrack(videoTrack)
+  }
 }
 
 const welcomeForm = welcome.querySelector("form")
@@ -114,7 +123,19 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit)
 
 // RTC Code
 function makeConnection(){
-  myPeerConnection = new RTCPeerConnection()
+  myPeerConnection = new RTCPeerConnection({
+    iceServers: [
+      {
+        urls: [
+          "stun:stun.l.google.com:19302",
+"stun:stun1.l.google.com:19302",
+"stun:stun2.l.google.com:19302",
+"stun:stun3.l.google.com:19302",
+"stun:stun4.l.google.com:19302"
+        ]
+      }
+    ]
+  })
   myPeerConnection.addEventListener("icecandidate", handleIce)
   myPeerConnection.addEventListener("addstream", handleAddStream)
   myStream.getTracks().forEach((track)=>{
@@ -123,24 +144,31 @@ function makeConnection(){
 }
 
 function handleIce(data){
-  console.log(data)
+  
   socket.emit("ice",data.candidate, roomName)
 }
 
 function handleAddStream(data){
   const peersStream = document.getElementById("peersStream")
   peersStream.srcObject = data.stream
-  console.log(data.stream)
+  
 }
 
 // Socket Code
 socket.on("welcome", async ()=>{
+  myDataChannel = myPeerConnection.createDataChannel("chat")
+  myDataChannel.addEventListener("message", console.log)
+  console.log("made data channel")
   const offer = await myPeerConnection.createOffer()
   myPeerConnection.setLocalDescription(offer)
   socket.emit("offer", offer, roomName)
 })
 
 socket.on("offer", async (offer)=>{
+  myPeerConnection.addEventListener("datachannel", (event)=>{
+    myDataChannel = event.channel;
+    myDataChannel.addEventListener("message",console.log)
+  })
   console.log("received the offer")
  myPeerConnection.setRemoteDescription(offer)
  const answer= await myPeerConnection.createAnswer()
