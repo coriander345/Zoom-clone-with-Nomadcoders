@@ -12,13 +12,19 @@ app.get("/*", (req,res)=>res.redirect("/"))
 
 const httpServer = http.createServer(app);
 const io = SocketIO(httpServer)
+const roomList = []
 
 io.on("connection", socket=>{
 
+  if(roomList){
+    socket.broadcast.emit("enter", roomList)
+  }
   socket.on("join_room", (roomName)=>{
     socket.join(roomName)
-    
-    socket.to(roomName).emit("welcome")
+    //socket.broadcast.emit("welcome", roomName)
+    socket.to(roomName).emit("welcome", roomName)
+    roomList.push(roomName)
+    socket.room = roomName
   })
 
   socket.on("offer", (offer, roomName)=>{
@@ -32,6 +38,14 @@ io.on("connection", socket=>{
   socket.on("ice", (ice,roomName)=>{
     socket.to(roomName).emit("ice", ice)
   })
+
+  socket.on("disconnect", (reason) => {
+    console.log(reason)
+    if(roomList.length !== 0){
+     
+    }
+    
+  });
 })
 const handleListen = ()=>console.log("hello")
 httpServer.listen(3000,handleListen)

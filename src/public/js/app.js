@@ -19,7 +19,7 @@ call.hidden=true
 
 let myDataChannel;
 
-
+console.log(socket)
 async function getCameras() {
   try {
     const devices  = await navigator.mediaDevices.enumerateDevices();
@@ -112,7 +112,7 @@ async function handleWelcomeSubmit(event){
   roomName = input.value
   await initCall()
   socket.emit("join_room", input.value)
-  
+  socket.room = roomName
   input.value=""
 }
 
@@ -138,6 +138,7 @@ function makeConnection(){
   })
   myPeerConnection.addEventListener("icecandidate", handleIce)
   myPeerConnection.addEventListener("addstream", handleAddStream)
+
   myStream.getTracks().forEach((track)=>{
     myPeerConnection.addTrack(track,myStream)
   })
@@ -155,13 +156,18 @@ function handleAddStream(data){
 }
 
 // Socket Code
-socket.on("welcome", async ()=>{
+socket.on("enter", (roomList)=>{
+  console.log(roomList)
+})
+socket.on("welcome", async (roomName)=>{
+  
   myDataChannel = myPeerConnection.createDataChannel("chat")
   myDataChannel.addEventListener("message", console.log)
   console.log("made data channel")
   const offer = await myPeerConnection.createOffer()
   myPeerConnection.setLocalDescription(offer)
   socket.emit("offer", offer, roomName)
+  
 })
 
 socket.on("offer", async (offer)=>{
@@ -177,11 +183,15 @@ socket.on("offer", async (offer)=>{
   console.log("sent the answer")
 })
 
-socket.on("answer", (answer)=>{
-  console.log("receive the answer" )
+socket.on("answer", (answer,roomName)=>{
+  console.log("receive the answer: " + roomName )
   myPeerConnection.setRemoteDescription(answer)
 })
 socket.on("ice", async (ice)=>{
   console.log("receive candidate")
   await myPeerConnection.addIceCandidate(ice)
 })
+
+socket.on("close", (reason) => {
+  console.log(reason)
+});
