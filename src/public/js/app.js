@@ -5,6 +5,7 @@ const myFace = document.getElementById("myFace")
 const muteBtn = document.getElementById("mute")
 const cameraBtn = document.getElementById("camera")
 const camerasSelect = document.getElementById("cameras")
+const roomList  =document.getElementById("roomList")
 
 const welcome = document.getElementById("welcome")
 const call = document.getElementById("call")
@@ -19,7 +20,7 @@ call.hidden=true
 
 let myDataChannel;
 
-console.log(socket)
+
 async function getCameras() {
   try {
     const devices  = await navigator.mediaDevices.enumerateDevices();
@@ -101,6 +102,7 @@ async function initCall(){
   await getMedia()
   call.hidden=false
   welcome.hidden=true
+  roomList.hidden= true
   const h3 = call.querySelector("h3")
   h3.innerText = "Room Name: "+roomName
   makeConnection()
@@ -156,8 +158,8 @@ function handleAddStream(data){
 }
 
 // Socket Code
-socket.on("enter", (roomList)=>{
-  console.log(roomList)
+socket.on("connect", ()=>{
+  console.log(socket)
 })
 socket.on("welcome", async (roomName)=>{
   
@@ -192,6 +194,17 @@ socket.on("ice", async (ice)=>{
   await myPeerConnection.addIceCandidate(ice)
 })
 
-socket.on("close", (reason) => {
-  console.log(reason)
-});
+
+socket.on("room_change", (rooms)=>{
+  const roomUl = roomList.querySelector("ul");
+  roomUl.innerHTML="";
+  if(rooms.length===0){
+    return 
+  }
+  window.localStorage.setItem("roomList", rooms)
+  rooms.forEach((room)=>{
+    const li = document.createElement("li")
+    li.innerText = room;
+    roomUl.append(li)
+  })
+})

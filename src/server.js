@@ -14,17 +14,31 @@ const httpServer = http.createServer(app);
 const io = SocketIO(httpServer)
 const roomList = []
 
-io.on("connection", socket=>{
+function publicRooms(){
+  const {
+    sockets:{
+      adapter: {sids, rooms},
+    }
+  }= io;
+  const publicRooms=[];
+  rooms.forEach((_,key)=>{
+    if(sids.get(key)===undefined){
+      publicRooms.push(key)
+      roomList.push(key)
+    }
+  })
+  return publicRooms
+}
 
-  if(roomList){
-    socket.broadcast.emit("enter", roomList)
-  }
+io.on("connection", socket=>{
+  
+  
   socket.on("join_room", (roomName)=>{
     socket.join(roomName)
     //socket.broadcast.emit("welcome", roomName)
     socket.to(roomName).emit("welcome", roomName)
     roomList.push(roomName)
-    socket.room = roomName
+    socket.broadcast.emit("room_change", publicRooms())
   })
 
   socket.on("offer", (offer, roomName)=>{
