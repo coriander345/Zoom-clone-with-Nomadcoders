@@ -1,0 +1,65 @@
+body {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: bisque;
+}
+
+header {
+  margin: -50px 0 60px 0;
+}
+header h1 {
+  margin: 0;
+  color: #fff;
+  text-shadow: black 0 2px 5px;
+  font-size: 70px;
+}
+
+.logo {
+  margin-left: 50px;
+}
+
+.roomNameForm {
+  width: 330px;
+  height: 30px;
+  border-radius: 8px;
+}
+.roomNameInput {
+  padding: 5px 5px 5px 8px;
+  height: 80%;
+  width: 60%;
+  outline: 0;
+  border: 0ch;
+  border-radius: 8px;
+}
+#enterBtn {
+  margin: 0 0 0 8px;
+  padding: 5px;
+  height: 35px;
+  width: 30%;
+  border-radius: 8px;
+  outline: 0ch;
+  border: 0ch;
+  cursor: pointer;
+}
+#enterBtn:hover {
+  background-color: #d6d1d1;
+}
+#enterBtn:active {
+  background-color: #b1aeae;
+  color: cornsilk;
+}
+
+#roomList ul {
+  background-color: cornsilk;
+}
+
+#roomList ul li {
+  cursor: pointer;
+}
+#roomList ul li:hover {
+  background-color: rgb(247, 235, 195);
+}

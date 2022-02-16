@@ -5,27 +5,27 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Noom
-    link(rel="stylesheet", href="https://unpkg.com/mvp.css")
+    link(rel="stylesheet", href="/public/css/styled.css")
 
   body 
     header
       h1 Noom! 
+      img(class="logo" src="../public/photos/bearFoot.png", width="100px", height="100px")
     main 
       div#welcome
-        form 
-          input(type="text", placeholder="room name", required)
-          button Enter room
-        h4 Open Rooms 
-        ul
-      div#room
+        form(class="roomNameForm" action="") 
+          input(class="roomNameInput" type="text", placeholder="room name", required)
+          button#enterBtn Create Room
+        div#roomList
+          ul
+      div#call
         h3
-        ul 
-        form#name  
-          input(placeholder="nick", required, type="text")
-          button save
-        form#msg  
-          input(placeholder="message", required, type="text")
-          button Send
+        div#myStream 
+          video#myFace(autoplay, playsinline, width="400", height="400")
+          button#mute Mute
+          button#camera turn Camera Off
+          select#cameras
+          video#peersStream(autoplay, playsinline, width="400", height="400")
     script(src="/socket.io/socket.io.js")
     script(src="/public/js/app.js")
     
