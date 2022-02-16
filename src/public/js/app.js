@@ -10,6 +10,7 @@ const roomList  =document.getElementById("roomList")
 const welcome = document.getElementById("welcome")
 const call = document.getElementById("call")
 
+const roomNames = JSON.parse(window.localStorage.getItem("roomList"))
 
 let myStream;
 let muted = false;
@@ -21,6 +22,18 @@ call.hidden=true
 let myDataChannel;
 
 
+if(roomNames.length!==0){
+  const roomUl = roomList.querySelector("ul");
+  console.log(roomNames)
+  roomNames.forEach((room)=>{
+    const li = document.createElement("li")
+    li.innerText = room;
+    roomUl.append(li)
+    const button = document.createElement("button")
+    button.innerText = "Join Room"
+    li.append(button)
+  })
+}
 async function getCameras() {
   try {
     const devices  = await navigator.mediaDevices.enumerateDevices();
@@ -201,8 +214,9 @@ socket.on("room_change", (rooms)=>{
   if(rooms.length===0){
     return 
   }
-  window.localStorage.setItem("roomList", rooms)
-  rooms.forEach((room)=>{
+  window.localStorage.setItem("roomList", JSON.stringify(rooms))
+  
+  roomNames.forEach((room)=>{
     const li = document.createElement("li")
     li.innerText = room;
     roomUl.append(li)

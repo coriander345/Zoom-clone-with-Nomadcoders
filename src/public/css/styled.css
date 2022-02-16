@@ -50,16 +50,18 @@ header h1 {
 }
 #enterBtn:active {
   background-color: #b1aeae;
-  color: cornsilk;
+  color: rgb(255, 255, 255);
 }
 
 #roomList ul {
-  background-color: cornsilk;
+  border-radius: 8px;
 }
 
 #roomList ul li {
   cursor: pointer;
+  font-size: 20px;
 }
-#roomList ul li:hover {
-  background-color: rgb(247, 235, 195);
+
+#roomList ul li button {
+  margin-left: 30px;
 }

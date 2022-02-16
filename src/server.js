@@ -20,13 +20,16 @@ function publicRooms(){
       adapter: {sids, rooms},
     }
   }= io;
+  
   const publicRooms=[];
   rooms.forEach((_,key)=>{
     if(sids.get(key)===undefined){
       publicRooms.push(key)
       roomList.push(key)
+      console.log(key)
     }
   })
+  //console.log(io.sockets.adapter.rooms, publicRooms)
   return publicRooms
 }
 
@@ -56,7 +59,7 @@ io.on("connection", socket=>{
   socket.on("disconnect", (reason) => {
     console.log(reason)
     if(roomList.length !== 0){
-     
+    //  socket.broadcast.emit("room_change",)
     }
     
   });
