@@ -9,20 +9,39 @@ const roomList  =document.getElementById("roomList")
 
 const welcome = document.getElementById("welcome")
 const call = document.getElementById("call")
+const joinBtn = document.getElementById("joinBtn")
+console.log(joinBtn)
+call.hidden=getLocalStorage("call")
 
 const roomNames = JSON.parse(window.localStorage.getItem("roomList"))
+
+window.localStorage.setItem("call_hidden", true)
+window.localStorage.setItem("welcome_hidden", false)
 
 let myStream;
 let muted = false;
 let cameraOff = false
 let roomName;
 let myPeerConnection;
-call.hidden=true
-
 let myDataChannel;
 
+function getLocalStorage(src){
+  if(src === "call"){
+    return JSON.parse(window.localStorage.getItem("call_hidden"))
+  } else{
+    return JSON.parse(window.localStorage.getItem("welcome_hidden"))
+  }
+}
 
-if(roomNames.length!==0){
+function setLocalStorage(key, value){
+  if(key === "call"){
+    return window.localStorage.setItem("call_hidden", value)
+  } else{
+    return window.localStorage.getItem("welcome_hidden", value)
+  }
+}
+
+if(roomNames){
   const roomUl = roomList.querySelector("ul");
   console.log(roomNames)
   roomNames.forEach((room)=>{
@@ -34,6 +53,9 @@ if(roomNames.length!==0){
     li.append(button)
   })
 }
+
+
+
 async function getCameras() {
   try {
     const devices  = await navigator.mediaDevices.enumerateDevices();
@@ -136,6 +158,7 @@ cameraBtn.addEventListener("click", handleCameraClick)
 camerasSelect.addEventListener("input", handleCameraChange)
 welcomeForm.addEventListener("submit", handleWelcomeSubmit)
 
+
 // RTC Code
 function makeConnection(){
   myPeerConnection = new RTCPeerConnection({
@@ -159,8 +182,7 @@ function makeConnection(){
   })
 }
 
-function handleIce(data){
-  
+function handleIce(data){ 
   socket.emit("ice",data.candidate, roomName)
 }
 
@@ -174,8 +196,8 @@ function handleAddStream(data){
 socket.on("connect", ()=>{
   console.log(socket)
 })
+
 socket.on("welcome", async (roomName)=>{
-  
   myDataChannel = myPeerConnection.createDataChannel("chat")
   myDataChannel.addEventListener("message", console.log)
   console.log("made data channel")
@@ -211,14 +233,17 @@ socket.on("ice", async (ice)=>{
 socket.on("room_change", (rooms)=>{
   const roomUl = roomList.querySelector("ul");
   roomUl.innerHTML="";
-  if(rooms.length===0){
-    return 
-  }
-  window.localStorage.setItem("roomList", JSON.stringify(rooms))
+  if(rooms.length===0) return 
   
-  roomNames.forEach((room)=>{
+  window.localStorage.setItem("roomList", JSON.stringify(rooms))
+  console.log(roomNames)
+  rooms.forEach((room)=>{
     const li = document.createElement("li")
     li.innerText = room;
     roomUl.append(li)
+    const button = document.createElement("button")
+    button.setAttribute('id','joinBtn');
+    button.innerText = "Join Room"
+    li.append(button)
   })
 })

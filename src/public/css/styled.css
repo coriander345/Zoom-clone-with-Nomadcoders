@@ -53,15 +53,35 @@ header h1 {
   color: rgb(255, 255, 255);
 }
 
-#roomList ul {
+#roomList {
+  margin-top: 20px;
   border-radius: 8px;
+  background-color: #ffbbbb;
+  box-shadow: black 0 3px 5px;
+  padding: 7px;
+}
+#roomList h3 {
+  margin: 0px;
+  color: #494848;
 }
 
+#roomList ul {
+  line-height: 1.7em;
+  padding: 0;
+  list-style-type: none;
+}
 #roomList ul li {
   cursor: pointer;
   font-size: 20px;
+  border-bottom: 0.2mm solid black;
+  padding-left: 5px;
+  color: #3f51b5;
+  display: flex;
+  justify-content: space-between;
 }
 
 #roomList ul li button {
-  margin-left: 30px;
+  margin-left: 150px;
+  height: 22px;
+  margin-top: 6px;
 }
