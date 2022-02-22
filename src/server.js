@@ -21,16 +21,16 @@ function publicRooms(){
     }
   }= io;
   
-  const publicRooms=[];
+  const Rooms=[];
   rooms.forEach((_,key)=>{
     if(sids.get(key)===undefined){
-      publicRooms.push(key)
+      Rooms.push(key)
       roomList.push(key)
       console.log(key)
     }
   })
-  //console.log(io.sockets.adapter.rooms, publicRooms)
-  return publicRooms
+  //console.log(Rooms)
+  return Rooms
 }
 
 io.on("connection", socket=>{

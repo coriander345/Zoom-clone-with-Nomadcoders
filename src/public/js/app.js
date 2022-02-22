@@ -9,14 +9,17 @@ const roomList  =document.getElementById("roomList")
 
 const welcome = document.getElementById("welcome")
 const call = document.getElementById("call")
-const joinBtn = document.getElementById("joinBtn")
-console.log(joinBtn)
-call.hidden=getLocalStorage("call")
 
 const roomNames = JSON.parse(window.localStorage.getItem("roomList"))
 
-window.localStorage.setItem("call_hidden", true)
+
+if(getLocalStorage("call")===null){
+  window.localStorage.setItem("call_hidden", true)
 window.localStorage.setItem("welcome_hidden", false)
+
+}
+call.hidden=getLocalStorage("call")
+welcome.hidden =getLocalStorage("welcome")
 
 let myStream;
 let muted = false;
@@ -37,18 +40,19 @@ function setLocalStorage(key, value){
   if(key === "call"){
     return window.localStorage.setItem("call_hidden", value)
   } else{
-    return window.localStorage.getItem("welcome_hidden", value)
+    return window.localStorage.setItem("welcome_hidden", value)
   }
 }
 
 if(roomNames){
   const roomUl = roomList.querySelector("ul");
   console.log(roomNames)
-  roomNames.forEach((room)=>{
+  roomNames.forEach((room,index)=>{
     const li = document.createElement("li")
     li.innerText = room;
     roomUl.append(li)
     const button = document.createElement("button")
+    button.setAttribute('id','joinBtn'+index);
     button.innerText = "Join Room"
     li.append(button)
   })
@@ -145,18 +149,52 @@ async function initCall(){
 
 async function handleWelcomeSubmit(event){
   event.preventDefault()
+  setLocalStorage("call", false)
+  setLocalStorage("welcome", true)
   const input = welcomeForm.querySelector("input")
   roomName = input.value
   await initCall()
   socket.emit("join_room", input.value)
   socket.room = roomName
   input.value=""
+  
 }
 
+async function handleJoinRoom(event){
+  console.log(event.path[1].innerText.split("\n")[0])
+  const roomUl = roomList.querySelector("ul");
+  const li = roomUl.querySelectorAll("li")
+  roomName = event.path[1].innerText.split("\n")[0]
+  await initCall()
+  socket.emit("join_room", roomName)
+  socket.room = roomName
+  // for(let el in li){
+  //  
+  // }
+  
+ 
+}
+
+
+// addEventListner
 muteBtn.addEventListener("click", handleMuteClick)
 cameraBtn.addEventListener("click", handleCameraClick)
 camerasSelect.addEventListener("input", handleCameraChange)
 welcomeForm.addEventListener("submit", handleWelcomeSubmit)
+
+  const roomUl = roomList.querySelector("ul");
+  const li = roomUl.querySelectorAll("li")
+  let liValue;
+  for(let key in li){
+    if(typeof li[key] === 'object'){
+      liValue =li[key].innerText.split("\n")[0]
+      const btnId = li[key].children[0].id
+      let joinBtn = document.getElementById(btnId)
+      joinBtn.addEventListener("click", handleJoinRoom)
+    }
+    
+  }
+
 
 
 // RTC Code
@@ -191,6 +229,8 @@ function handleAddStream(data){
   peersStream.srcObject = data.stream
   
 }
+
+
 
 // Socket Code
 socket.on("connect", ()=>{
@@ -233,17 +273,23 @@ socket.on("ice", async (ice)=>{
 socket.on("room_change", (rooms)=>{
   const roomUl = roomList.querySelector("ul");
   roomUl.innerHTML="";
-  if(rooms.length===0) return 
-  
-  window.localStorage.setItem("roomList", JSON.stringify(rooms))
-  console.log(roomNames)
-  rooms.forEach((room)=>{
+  if(rooms.length===0) return
+
+  let newRooms;
+  if(roomNames){
+    newRooms = [...roomNames, ...rooms]
+  }else{
+    newRooms = rooms
+  }
+
+  newRooms.forEach((room,index)=>{
     const li = document.createElement("li")
     li.innerText = room;
     roomUl.append(li)
     const button = document.createElement("button")
-    button.setAttribute('id','joinBtn');
+    button.setAttribute('id','joinBtn'+index);
     button.innerText = "Join Room"
     li.append(button)
   })
+  window.localStorage.setItem("roomList", JSON.stringify(newRooms))
 })
