@@ -9,6 +9,7 @@ const roomList  =document.getElementById("roomList")
 
 const welcome = document.getElementById("welcome")
 const call = document.getElementById("call")
+const roomsInStorage = JSON.parse(window.localStorage.getItem("roomList"))
 
 
 let myStream;
@@ -20,6 +21,19 @@ call.hidden=true
 
 let myDataChannel;
 
+// 새로고침 초기 설정 localStorage 확인
+if(roomsInStorage){
+  const roomUl = roomList.querySelector("ul");
+  roomsInStorage.forEach((room)=>{
+    const li = document.createElement("li")
+    li.innerText = room;
+    const button = document.createElement("button")
+    button.innerText = "Join Room"
+    button.setAttribute('id','joinBtn')
+    li.append(button)
+    roomUl.append(li)
+  })
+}
 
 async function getCameras() {
   try {
@@ -118,10 +132,30 @@ async function handleWelcomeSubmit(event){
   input.value=""
 }
 
+async function handleJoinRoom(el){
+  await initCall()
+  socket.emit("join_room", el)
+  //아예 socket을 다른 이름으로 연결할 수 도 있지만 그냥 사용하고 방 이름이 중복되는 경우만
+  //중복 제거하는 처리를 하기로 했다.
+  socket.room = el
+}
+
 muteBtn.addEventListener("click", handleMuteClick)
 cameraBtn.addEventListener("click", handleCameraClick)
 camerasSelect.addEventListener("input", handleCameraChange)
 welcomeForm.addEventListener("submit", handleWelcomeSubmit)
+
+const joinBtn = document.getElementById("joinBtn")
+
+//같은 id를 가진 여러 버튼의 이벤트
+if(joinBtn){
+  const lis = roomList.querySelectorAll("li")
+  
+  lis.forEach(li=>{
+    const button = li.querySelector("button")
+    button.addEventListener("click", ()=>handleJoinRoom(li.innerText.split("Join")[0]))
+  })
+}
 
 // RTC Code
 function makeConnection(){
@@ -198,13 +232,27 @@ socket.on("ice", async (ice)=>{
 socket.on("room_change", (rooms)=>{
   const roomUl = roomList.querySelector("ul");
   roomUl.innerHTML="";
+  let newRooms;
+  const localst = JSON.parse(window.localStorage.getItem("roomList"))
   if(rooms.length===0){
     return 
   }
-  window.localStorage.setItem("roomList", rooms)
-  rooms.forEach((room)=>{
+
+  if(localst){
+    newRooms = [...new Set([...localst, ...rooms])]
+  }else{
+    newRooms = rooms
+  }
+  newRooms.forEach((room)=>{
     const li = document.createElement("li")
     li.innerText = room;
+    const button = document.createElement("button")
+    button.innerText = "Join Room"
+    button.setAttribute('id','joinBtn')
+    li.append(button)
     roomUl.append(li)
   })
+  
+  window.localStorage.setItem("roomList", JSON.stringify(newRooms))
 })
+
