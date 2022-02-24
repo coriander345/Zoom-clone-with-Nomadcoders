@@ -249,6 +249,7 @@ socket.on("welcome", async (roomName)=>{
 
 socket.on("offer", async (offer)=>{
   myPeerConnection.addEventListener("datachannel", (event)=>{
+    console.log(event.channel, "this is channel")
     myDataChannel = event.channel;
     myDataChannel.addEventListener("message",console.log)
   })
